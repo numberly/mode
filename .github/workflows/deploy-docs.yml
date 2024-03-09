@@ -8,28 +8,31 @@ on:
   release:
     types: [created]
     branches:
-      - 'master'
+      - master
 
 jobs:
   build:
-    name: "Build docs"
+    name: Build docs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/setup-python@v4
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
-    - name: "Install runtime dependencies in order to get package metadata"
-      run: "scripts/install"
-    - name: "Install deps and build with Sphinx"
-      run: make docs
-    - name: "Upload artifacts"
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Install deps and build with Sphinx
+      run: scripts/build-docs.sh
+
+    - name: Upload artifacts
       uses: actions/upload-pages-artifact@v1
       with:
         # Upload built docs
-        path: "./Documentation"
+        path: "./site"
   deploy:
-    name: "Deploy docs"
+    name: Deploy docs
     if: github.event_name == 'release' && github.event.action == 'published'
     needs: build
     runs-on: ubuntu-latest
