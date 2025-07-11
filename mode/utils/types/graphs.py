@@ -4,7 +4,7 @@ import abc
 from collections.abc import Iterable, Mapping, MutableMapping, Sequence
 from typing import IO, Any, Generic, Optional, TypeVar
 
-__all__ = ["GraphFormatterT", "DependencyGraphT"]
+__all__ = ["DependencyGraphT", "GraphFormatterT"]
 
 _T = TypeVar("_T")
 

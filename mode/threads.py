@@ -26,10 +26,10 @@ from .utils.futures import (
 from .utils.locks import Event
 
 __all__ = [
-    "QueuedMethod",
-    "WorkerThread",
-    "ServiceThread",
     "QueueServiceThread",
+    "QueuedMethod",
+    "ServiceThread",
+    "WorkerThread",
 ]
 
 

@@ -62,6 +62,7 @@ class test_Proxy:
         assert x.__doc__ == "real function"
 
         assert x.__class__ == type(real)  # noqa: E721
+
         assert x.__dict__ == real.__dict__
         assert repr(x) == repr(real)
         assert x.__module__

@@ -17,11 +17,11 @@ __all__ = [
     "Bucket",
     "Seconds",
     "TokenBucket",
+    "humanize_seconds",
+    "humanize_seconds_ago",
     "rate",
     "rate_limit",
     "want_seconds",
-    "humanize_seconds",
-    "humanize_seconds_ago",
 ]
 
 TIME_MONOTONIC: Callable[[], float]

@@ -92,7 +92,7 @@ class test_FactoryMapping:
 
     def test__finalize(self, *, map):
         map.namespaces = {"foo"}
-        with patch_iter_entry_points():
+        with patch_importlib_metadata_entry_points():
             map._finalize()
         assert map.aliases["ep1"] == "foo:a"
         assert map.aliases["ep2"] == "bar:c"
@@ -158,7 +158,7 @@ def test_smart_import():
 
 
 def test_load_extension_classes():
-    with patch_iter_entry_points():
+    with patch_importlib_metadata_entry_points():
         with patch("mode.utils.imports.symbol_by_name") as sbn:
             assert list(load_extension_classes("foo")) == [
                 EntrypointExtension("ep1", sbn.return_value),
@@ -169,15 +169,15 @@ def test_load_extension_classes():
 
 
 def test_load_extension_classes_syntax_error():
-    with patch_iter_entry_points():
+    with patch_importlib_metadata_entry_points():
         with patch("mode.utils.imports.symbol_by_name") as sbn:
             sbn.side_effect = SyntaxError()
-            with pytest.warns(UserWarning):
+            with pytest.warns(UserWarning, match="Cannot load (.*) extension"):
                 assert list(load_extension_classes("foo")) == []
 
 
 def test_load_extension_class_names():
-    with patch_iter_entry_points():
+    with patch_importlib_metadata_entry_points():
         assert list(load_extension_class_names("foo")) == [
             RawEntrypointExtension("ep1", "foo:a"),
             RawEntrypointExtension("ep2", "bar:c"),
@@ -185,17 +185,17 @@ def test_load_extension_class_names():
 
 
 @contextmanager
-def patch_iter_entry_points():
-    with patch("mode.utils.imports.entry_points") as entry_points:
+
+def patch_importlib_metadata_entry_points():
+    with patch(
+        "importlib.metadata.entry_points"
+    ) as importlib_metadata_entry_points:
         ep1 = Mock(name="ep1")
         ep1.name = "ep1"
-        ep1.module_name = "foo"
-        ep1.attrs = ["a", "b"]
+        ep1.module = "foo"
+        ep1.attr = "a"
         ep2 = Mock(name="ep2")
         ep2.name = "ep2"
-        ep2.module_name = "bar"
-        ep2.attrs = ["c", "d"]
-        entry_points.return_value = (ep1, ep2)
         yield
 
 
