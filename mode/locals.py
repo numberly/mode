@@ -93,7 +93,7 @@ from collections.abc import (
 )
 from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from functools import wraps
-from types import CoroutineType, GetSetDescriptorType, TracebackType
+from types import GetSetDescriptorType, TracebackType
 from typing import (
     Any,
     Callable,
@@ -479,10 +479,10 @@ class AsyncGeneratorRole(AsyncGenerator[T_co, T_contra]):
         obj = self._get_current_object()  # type: ignore
         return cast(AsyncGenerator[T_co, T_contra], obj)
 
-    def __anext__(self) -> CoroutineType[Any, Any, T_co]:
+    def __anext__(self) -> Coroutine[Any, Any, T_co]:
         return self._get_generator().__anext__()
 
-    def asend(self, value: T_contra) -> CoroutineType[Any, Any, T_co]:
+    def asend(self, value: T_contra) -> Coroutine[Any, Any, T_co]:
         return self._get_generator().asend(value)
 
     def athrow(
@@ -490,10 +490,10 @@ class AsyncGeneratorRole(AsyncGenerator[T_co, T_contra]):
         typ: type[BaseException],
         val: Optional[BaseException] = None,
         tb: Optional[TracebackType] = None,
-    ) -> CoroutineType[Any, Any, T_co]:
+    ) -> Coroutine[Any, Any, T_co]:
         return self._get_generator().athrow(typ, val, tb)
 
-    def aclose(self) -> CoroutineType[Any, Any, None]:
+    def aclose(self) -> Coroutine[Any, Any, None]:
         return self._get_generator().aclose()
 
     def __aiter__(self) -> AsyncGenerator[T_co, T_contra]:
@@ -708,19 +708,19 @@ class ContextManagerProxy(
 class AsyncContextManagerRole(AbstractAsyncContextManager[T_co]):
     """Role/Mixin for `contextlib.AbstractAsyncContextManager` proxy methods."""
 
-    def __aenter__(self) -> CoroutineType[Any, Any, T_co]:
+    def __aenter__(self) -> Coroutine[Any, Any, T_co]:
         obj = self._get_current_object()  # type: ignore
-        return cast(CoroutineType[Any, Any, T_co], obj.__aenter__())
+        return obj.__aenter__()
 
     def __aexit__(
         self,
         exc_type: Optional[type[BaseException]],
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
-    ) -> CoroutineType[Any, Any, Optional[bool]]:
+    ) -> Coroutine[Any, Any, Optional[bool]]:
         obj = self._get_current_object()  # type: ignore
         val = obj.__aexit__(exc_type, exc_value, traceback)
-        return cast(CoroutineType[Any, Any, Optional[bool]], val)
+        return cast(Coroutine[Any, Any, Optional[bool]], val)
 
 
 class AsyncContextManagerProxy(
