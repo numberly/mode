@@ -185,11 +185,8 @@ def test_load_extension_class_names():
 
 
 @contextmanager
-
 def patch_importlib_metadata_entry_points():
-    with patch(
-        "importlib.metadata.entry_points"
-    ) as importlib_metadata_entry_points:
+    with patch("importlib.metadata.entry_points"):
         ep1 = Mock(name="ep1")
         ep1.name = "ep1"
         ep1.module = "foo"

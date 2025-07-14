@@ -379,7 +379,6 @@ def load_extension_class_names(
         )
 
 
-
 @contextmanager
 def cwd_in_path() -> Generator:
     """Context adding the current working directory to sys.path."""

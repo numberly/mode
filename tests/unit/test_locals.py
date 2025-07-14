@@ -642,7 +642,7 @@ class test_AsyncGeneratorProxy(test_AsyncIteratorProxy):
                 multiplier *= 2
 
     @pytest.fixture
-    def _coro(self):  # noqa: PT005
+    def _coro(self):
         return self.corogen()
 
     @pytest.fixture
@@ -678,7 +678,7 @@ class test_CoroutineProxy:
                 multiplier *= 2
 
     @pytest.fixture
-    def _coro(self):  # noqa: PT005
+    def _coro(self):
         return self.corogen()
 
     @pytest.fixture
