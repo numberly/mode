@@ -98,7 +98,7 @@ class Worker(Service):
         loglevel: Optional[Union[str, int]] = None,
         logfile: Optional[Union[str, IO]] = None,
         redirect_stdouts: bool = True,
-        redirect_stdouts_level: logging.Severity = None,
+        redirect_stdouts_level: Optional[logging.Severity] = None,
         stdout: Optional[IO] = sys.stdout,
         stderr: Optional[IO] = sys.stderr,
         console_port: int = 50101,

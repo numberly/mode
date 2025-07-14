@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Iterable, Mapping, MutableSet
 from functools import partial
 from types import MethodType
-from typing import Any, Callable, Optional, cast, no_type_check
+from typing import Any, Callable, Optional, Union, cast, no_type_check
 from weakref import ReferenceType, WeakMethod, ref
 
 from .types.signals import (
@@ -16,7 +16,6 @@ from .types.signals import (
     SignalT,
     SyncSignalT,
     T,
-    T_contra,
 )
 from .utils.futures import maybe_async
 
@@ -37,7 +36,7 @@ class BaseSignal(BaseSignalT[T]):
         loop: Optional[asyncio.AbstractEventLoop] = None,
         default_sender: Any = None,
         receivers: Optional[MutableSet[SignalHandlerRefT]] = None,
-        filter_receivers: FilterReceiverMapping = None,
+        filter_receivers: Union[FilterReceiverMapping, None] = None,
     ) -> None:
         self.name = name or ""
         self.owner = owner
@@ -84,7 +83,7 @@ class BaseSignal(BaseSignalT[T]):
             starting = Signal()
 
         >>> X.starting
-        <Signal: X.strting>
+        <Signal: X.string>
         ```
         """
         if not self.name:
@@ -94,15 +93,18 @@ class BaseSignal(BaseSignalT[T]):
     def unpack_sender_from_args(self, *args: Any) -> tuple[T, tuple[Any, ...]]:
         sender = self.default_sender
         if sender is None:
-            if not args:
+            if not args or len(args) == 0:
                 raise TypeError("Signal.send requires at least one argument")
+
             if len(args) > 1:
                 sender, *args = args  # type: ignore
             else:
                 sender, args = args[0], ()
         return sender, args
 
-    def connect(self, fun: SignalHandlerT = None, **kwargs: Any) -> Callable:
+    def connect(
+        self, fun: Union[SignalHandlerT, None] = None, **kwargs: Any
+    ) -> Callable:
         if fun is not None:
             return self._connect(fun, **kwargs)
         return partial(self._connect, **kwargs)
@@ -134,7 +136,7 @@ class BaseSignal(BaseSignalT[T]):
             except ValueError:
                 pass
 
-    def iter_receivers(self, sender: T_contra) -> Iterable[SignalHandlerT]:
+    def iter_receivers(self, sender: object) -> Iterable[SignalHandlerT]:
         if self._receivers or self._filter_receivers:
             r = self._update_receivers(self._receivers)
             if sender is not None:

@@ -93,7 +93,7 @@ from collections.abc import (
 )
 from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from functools import wraps
-from types import GetSetDescriptorType, TracebackType
+from types import CoroutineType, GetSetDescriptorType, TracebackType
 from typing import (
     Any,
     Callable,
@@ -479,10 +479,10 @@ class AsyncGeneratorRole(AsyncGenerator[T_co, T_contra]):
         obj = self._get_current_object()  # type: ignore
         return cast(AsyncGenerator[T_co, T_contra], obj)
 
-    def __anext__(self) -> Awaitable[T_co]:
+    def __anext__(self) -> CoroutineType[Any, Any, T_co]:
         return self._get_generator().__anext__()
 
-    def asend(self, value: T_contra) -> Awaitable[T_co]:
+    def asend(self, value: T_contra) -> CoroutineType[Any, Any, T_co]:
         return self._get_generator().asend(value)
 
     def athrow(
@@ -490,10 +490,10 @@ class AsyncGeneratorRole(AsyncGenerator[T_co, T_contra]):
         typ: type[BaseException],
         val: Optional[BaseException] = None,
         tb: Optional[TracebackType] = None,
-    ) -> Awaitable[T_co]:
+    ) -> CoroutineType[Any, Any, T_co]:
         return self._get_generator().athrow(typ, val, tb)
 
-    def aclose(self) -> Awaitable[None]:
+    def aclose(self) -> CoroutineType[Any, Any, None]:
         return self._get_generator().aclose()
 
     def __aiter__(self) -> AsyncGenerator[T_co, T_contra]:
@@ -514,7 +514,7 @@ class SequenceRole(Sequence[T_co]):
         return cast(Sequence[T_co], obj)
 
     @overload
-    def __getitem__(self, i: int) -> T_co: ...
+    def __getitem__(self, s: int) -> T_co: ...
 
     @overload
     def __getitem__(self, s: slice) -> MutableSequence[T_co]: ...
@@ -556,13 +556,13 @@ class MutableSequenceRole(SequenceRole[T], MutableSequence[T]):
         self._get_sequence().insert(index, object)
 
     @overload
-    def __setitem__(self, i: int, o: T) -> None: ...
+    def __setitem__(self, s: int, o: T) -> None: ...
 
     @overload
     def __setitem__(self, s: slice, o: Iterable[T]) -> None: ...
 
-    def __setitem__(self, index_or_slice: Any, o: Any) -> None:
-        self._get_sequence().__setitem__(index_or_slice, o)
+    def __setitem__(self, s: Any, o: Any) -> None:
+        self._get_sequence().__setitem__(s, o)
 
     @overload
     def __delitem__(self, i: int) -> None: ...
@@ -708,19 +708,19 @@ class ContextManagerProxy(
 class AsyncContextManagerRole(AbstractAsyncContextManager[T_co]):
     """Role/Mixin for `contextlib.AbstractAsyncContextManager` proxy methods."""
 
-    def __aenter__(self) -> Awaitable[T_co]:
+    def __aenter__(self) -> CoroutineType[Any, Any, T_co]:
         obj = self._get_current_object()  # type: ignore
-        return cast(Awaitable[T_co], obj.__aenter__())
+        return cast(CoroutineType[Any, Any, T_co], obj.__aenter__())
 
     def __aexit__(
         self,
         exc_type: Optional[type[BaseException]],
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
-    ) -> Awaitable[Optional[bool]]:
+    ) -> CoroutineType[Any, Any, Optional[bool]]:
         obj = self._get_current_object()  # type: ignore
         val = obj.__aexit__(exc_type, exc_value, traceback)
-        return cast(Awaitable[Optional[bool]], val)
+        return cast(CoroutineType[Any, Any, Optional[bool]], val)
 
 
 class AsyncContextManagerProxy(
