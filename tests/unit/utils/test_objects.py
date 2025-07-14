@@ -15,6 +15,7 @@ from mode.utils.objects import (
     InvalidAnnotation,
     KeywordReduce,
     Unordered,
+    _normalize_forwardref,
     _remove_optional,
     _restore_from_keywords,
     annotations,
@@ -186,13 +187,17 @@ def test_annotations():
 
     fields, defaults = annotations(X, globalns=globals(), localns=locals())
 
-    assert fields == {
+    expected = {
         "Foo": ClassVar[int],
         "foo": int,
         "bar": list[X],
         "baz": Union[list[X], str],
         "mas": int,
     }
+
+    norm_fields = {k: _normalize_forwardref(v) for k, v in fields.items()}
+    norm_expected = {k: _normalize_forwardref(v) for k, v in expected.items()}
+    assert norm_fields == norm_expected
     assert defaults["mas"] == 3
 
 
@@ -208,12 +213,15 @@ def test_annotations__skip_classvar():
         X, globalns=globals(), localns=locals(), skip_classvar=True
     )
 
-    assert fields == {
+    expected = {
         "foo": int,
         "bar": list[X],
         "baz": Union[list[X], str],
         "mas": int,
     }
+    norm_fields = {k: _normalize_forwardref(v) for k, v in fields.items()}
+    norm_expected = {k: _normalize_forwardref(v) for k, v in expected.items()}
+    assert norm_fields == norm_expected
     assert defaults["mas"] == 3
 
 

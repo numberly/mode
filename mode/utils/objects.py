@@ -257,6 +257,20 @@ def _detect_main_name() -> str:  # pragma: no cover
         return ".".join([*seen, path.stem])
 
 
+def _normalize_forwardref(t):
+    if isinstance(t, str):
+        return t
+    origin = getattr(t, "__origin__", None)
+    args = getattr(t, "__args__", None)
+    if origin and args:
+        if origin is ClassVar:
+            return origin[_normalize_forwardref(args[0])]
+        return origin[tuple(_normalize_forwardref(a) for a in args)]
+    if hasattr(t, "__qualname__") and "<locals>" in t.__qualname__:
+        return t.__name__
+    return t
+
+
 def annotations(
     cls: type,
     *,
@@ -325,7 +339,12 @@ def annotations(
                     localns=localns,
                 )
             )
-    return fields, defaults
+
+    # Normalize all field types for forward refs
+    normalized_fields = {
+        k: _normalize_forwardref(v) for k, v in fields.items()
+    }
+    return normalized_fields, defaults
 
 
 def local_annotations(
