@@ -197,6 +197,7 @@ def test_annotations():
 
     norm_fields = {k: _normalize_forwardref(v) for k, v in fields.items()}
     norm_expected = {k: _normalize_forwardref(v) for k, v in expected.items()}
+    assert len(norm_fields) == 5
     assert norm_fields == norm_expected
     assert defaults["mas"] == 3
 

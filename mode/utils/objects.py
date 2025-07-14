@@ -26,6 +26,9 @@ from typing import (
     Optional,
     TypeVar,
     cast,
+    get_args,
+    get_origin,
+    get_type_hints,
 )
 
 try:
@@ -44,19 +47,16 @@ except ImportError:
         return arg
 
 
-try:
-    from typing import _ClassVar  # type: ignore
-except ImportError:  # pragma: no cover
-    # CPython 3.7
-    from typing import _GenericAlias  # type: ignore
+def _is_class_var(typ):
+    # Works for typing.ClassVar and types.GenericAlias (Python 3.9+)
+    origin = getattr(typ, "__origin__", None)
+    return origin is ClassVar
 
-    def _is_class_var(x: Any) -> bool:
-        return isinstance(x, _GenericAlias) and x.__origin__ is ClassVar
 
-else:  # pragma: no cover
-    # CPython 3.6
-    def _is_class_var(x: Any) -> bool:
-        return type(x) is _ClassVar
+def _get_globalns(cls):
+    # Get the global namespace for a class
+    module = sys.modules.get(cls.__module__)
+    return module.__dict__ if module else {}
 
 
 __all__ = [
@@ -131,6 +131,14 @@ DICT_TYPES: tuple[type, ...] = (
 # XXX cast required for mypy bug
 # "expression has type Tuple[_SpecialForm]"
 TUPLE_TYPES: tuple[type, ...] = cast(tuple[type, ...], (tuple,))
+
+
+if sys.version_info >= (3, 10):
+    import types
+
+    UNION_TYPES = (typing.Union, types.UnionType)
+else:
+    UNION_TYPES = (typing.Union,)
 
 
 class InvalidAnnotation(Exception):
@@ -356,8 +364,11 @@ def local_annotations(
     globalns: Optional[dict[str, Any]] = None,
     localns: Optional[dict[str, Any]] = None,
 ) -> Iterable[tuple[str, type]]:
+    d = get_type_hints(
+        cls, globalns if globalns is not None else _get_globalns(cls), localns
+    )
     return _resolve_refs(
-        cls.__annotations__,
+        d,
         globalns if globalns is not None else _get_globalns(cls),
         localns,
         invalid_types or set(),
@@ -435,10 +446,6 @@ def _ForwardRef_safe_eval(
     return ref.__forward_value__
 
 
-def _get_globalns(typ: type) -> dict[str, Any]:
-    return sys.modules[typ.__module__].__dict__
-
-
 def iter_mro_reversed(cls: type, stop: type) -> Iterable[type]:
     """Iterate over superclasses, in reverse Method Resolution Order.
 
@@ -484,51 +491,36 @@ def remove_optional(typ: type) -> type:
 
 
 def is_union(typ: type) -> bool:
-    name = typ.__class__.__name__
-    return any(
-        [
-            name == "_UnionGenericAlias",  # 3.9
-            name == "_GenericAlias" and typ.__origin__ is typing.Union,  # 3.7
-            name == "_Union",  # 3.6
-        ]
-    )
+    return get_origin(typ) in UNION_TYPES
 
 
 def is_optional(typ: type) -> bool:
-    if is_union(typ):
-        args = getattr(typ, "__args__", ())
-        return any(True for arg in args if arg is None or arg is type(None))
+    origin = get_origin(typ)
+    if origin in UNION_TYPES:
+        args = get_args(typ)
+        return any(arg is type(None) for arg in args)
     return False
 
 
-def _remove_optional(
-    typ: type, *, find_origin: bool = False
-) -> tuple[list[Any], type]:
-    args = getattr(typ, "__args__", ())
-    if is_union(typ):
-        # Optional[list[int]] -> Union[list[int], NoneType]
-        # returns: ((int,), list)
-        found_None = False
-        union_type_args: Optional[list] = None
-        union_type: Optional[type] = None
-        for arg in args:
-            if arg is None or arg is type(None):
-                found_None = True
-            else:
-                union_type_args = getattr(arg, "__args__", ())
-                union_type = arg
-                if find_origin:
-                    if union_type is not None and sys.version_info.minor == 6:
-                        union_type = _py36_maybe_unwrap_GenericMeta(union_type)
-                    else:
-                        union_type = getattr(arg, "__origin__", arg)
-        if union_type is not None and found_None:
-            return cast(list, union_type_args), union_type
+def _remove_optional(typ: type, *, find_origin: bool = False) -> Any:
+    origin = get_origin(typ)
+    args = get_args(typ)
+    if origin in UNION_TYPES:
+        non_none_args = [arg for arg in args if arg is not type(None)]
+        if len(non_none_args) == 1:
+            typ = non_none_args[0]
+            origin = get_origin(typ)
+            args = get_args(typ)
+        else:
+            # If multiple non-None args, treat as a union
+            typ = typing.Union[tuple(non_none_args)]
+            origin = get_origin(typ)
+            args = get_args(typ)
     if find_origin:
-        if hasattr(typ, "__origin__"):
-            # list[int] -> ((int,), list)
-            typ = _py36_maybe_unwrap_GenericMeta(typ)
-
+        if origin is None:
+            return (), typ
+        else:
+            return args, origin
     return args, typ
 
 
