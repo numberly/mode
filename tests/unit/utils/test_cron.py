@@ -25,7 +25,7 @@ def test_secs_for_next():
 
 @freeze_time("2000-01-01 00:00:00")
 def test_secs_for_next_with_tz():
-    pacific = ZoneInfo("US/Pacific")
+    pacific = ZoneInfo("America/Los_Angeles")
 
     every_8pm_cron_format = "0 20 * * *"
     # In Pacific time it's 16:00 so only 4 hours until 8:00pm

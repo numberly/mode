@@ -186,13 +186,23 @@ def test_load_extension_class_names():
 
 @contextmanager
 def patch_importlib_metadata_entry_points():
-    with patch("importlib.metadata.entry_points"):
+    with patch(
+        "mode.utils.imports.entry_points"
+    ) as importlib_metadata_entry_points:
         ep1 = Mock(name="ep1")
         ep1.name = "ep1"
         ep1.module = "foo"
         ep1.attr = "a"
         ep2 = Mock(name="ep2")
         ep2.name = "ep2"
+        ep2.module = "bar"
+        ep2.attr = "c"
+        # For Python >=3.10
+        mock_entry_points = Mock()
+        mock_entry_points.select.return_value = [ep1, ep2]
+        # For Python <3.10
+        mock_entry_points.get.return_value = [ep1, ep2]
+        importlib_metadata_entry_points.return_value = mock_entry_points
         yield
 
 

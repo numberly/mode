@@ -299,6 +299,7 @@ def symbol_by_name(
             raise ValueError(f"Cannot import {name!r}: {exc}").with_traceback(
                 sys.exc_info()[2]
             ) from exc
+
         if attribute_name:
             return cast(_T, getattr(module, attribute_name))
         else:
@@ -306,7 +307,7 @@ def symbol_by_name(
     except (ImportError, AttributeError):
         if default is None:
             raise
-    return default
+        return default
 
 
 class EntrypointExtension(NamedTuple):
@@ -373,10 +374,19 @@ def load_extension_class_names(
     [('msgpack', 'faust_msgpack:msgpack')]
     ```
     """
-    for ep in entry_points(group=namespace):
-        yield RawEntrypointExtension(
-            ep.name, ":".join([ep.module_name, ep.attrs[0]])
-        )
+    eps = entry_points()
+    # Python 3.10+
+    if hasattr(eps, "select"):
+        for ep in eps.select(group=namespace):
+            yield RawEntrypointExtension(
+                ep.name, ":".join([ep.module, ep.attr])
+            )
+    # Python <3.10
+    else:
+        for ep in eps.get(namespace, []):
+            yield RawEntrypointExtension(
+                ep.name, ":".join([ep.module, ep.attr])
+            )
 
 
 @contextmanager
