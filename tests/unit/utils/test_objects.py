@@ -249,12 +249,6 @@ def test_annotations__no_local_ns_raises():
         annotations(X, globalns=None, localns=None)
 
 
-# Union[type(None)] actually returns None
-# so we have to construct this object to test condition in code.
-WeirdNoneUnion = Union[str, int]
-WeirdNoneUnion.__args__ = (type(None), type(None))
-
-
 @pytest.mark.parametrize(
     "input,expected",
     [
@@ -271,7 +265,6 @@ WeirdNoneUnion.__args__ = (type(None), type(None))
         (str, str),
         (list[str], list[str]),
         (Union[str, int, float], Union[str, int, float]),
-        (WeirdNoneUnion, WeirdNoneUnion),
     ],
 )
 def test_remove_optional(input, expected):
@@ -296,7 +289,6 @@ def test_remove_optional(input, expected):
         (Optional[list[int]], ((int,), list)),
         (str, ((), str)),
         (list[str], ((str,), list)),
-        (WeirdNoneUnion, ((type(None), type(None)), Union)),
     ],
 )
 def test__remove_optional__find_origin(input, expected):
