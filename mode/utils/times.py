@@ -118,8 +118,8 @@ class Bucket(AbstractAsyncContextManager):
         rate: Seconds,
         over: Seconds = 1.0,
         *,
-        fill_rate: Seconds = None,
-        capacity: Seconds = None,
+        fill_rate: Optional[Seconds] = None,
+        capacity: Optional[Seconds] = None,
         raises: Optional[type[BaseException]] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:

@@ -111,5 +111,5 @@ class DependencyGraphT(Generic[_T], Mapping[_T, _T]):
 
     @abc.abstractmethod
     def to_dot(
-        self, fh: IO, *, formatter: GraphFormatterT[_T] = None
+        self, fh: IO, *, formatter: Optional[GraphFormatterT[_T]] = None
     ) -> None: ...

@@ -136,8 +136,8 @@ class Heap(MutableSequence[T]):
         else:
             return nsmallest(n, self.data)
 
-    def insert(self, index: int, object: T) -> None:
-        self.data.insert(index, object)
+    def insert(self, index: int, value: T) -> None:
+        self.data.insert(index, value)
 
     def __str__(self) -> str:
         return str(self.data)
@@ -146,7 +146,7 @@ class Heap(MutableSequence[T]):
         return repr(self.data)
 
     @overload
-    def __getitem__(self, i: int) -> T: ...
+    def __getitem__(self, s: int) -> T: ...
 
     @overload
     def __getitem__(self, s: slice) -> MutableSequence[T]: ...
@@ -155,13 +155,13 @@ class Heap(MutableSequence[T]):
         return self.data.__getitem__(s)
 
     @overload
-    def __setitem__(self, i: int, o: T) -> None: ...
+    def __setitem__(self, s: int, o: T) -> None: ...
 
     @overload
     def __setitem__(self, s: slice, o: Iterable[T]) -> None: ...
 
-    def __setitem__(self, index_or_slice: Any, o: Any) -> None:
-        self.data.__setitem__(index_or_slice, o)
+    def __setitem__(self, s: Any, o: Any) -> None:
+        self.data.__setitem__(s, o)
 
     @overload
     def __delitem__(self, i: int) -> None: ...
@@ -264,7 +264,7 @@ class FastUserSet(MutableSet[T]):
     def __len__(self) -> int:
         return len(self.data)
 
-    def __or__(self, other: Set) -> Set[Union[T, T_co]]:
+    def __or__(self, other: Set) -> Set[Union[T, object]]:
         return self.data.__or__(other)
 
     def __rand__(self, other: Set[T]) -> MutableSet[T]:
@@ -294,7 +294,7 @@ class FastUserSet(MutableSet[T]):
     def __str__(self) -> str:
         return str(self.data)
 
-    def __sub__(self, other: Set[Any]) -> MutableSet[T_co]:
+    def __sub__(self, other: Set[Any]) -> MutableSet[object]:
         return cast(MutableSet, self.data.__sub__(other))
 
     def __xor__(self, other: Set) -> MutableSet[T]:
@@ -342,8 +342,8 @@ class FastUserSet(MutableSet[T]):
         self.data.__ixor__(other)
         return self
 
-    def add(self, element: T) -> None:
-        self.data.add(element)
+    def add(self, value: T) -> None:
+        self.data.add(value)
 
     def clear(self) -> None:
         self.data.clear()
@@ -351,8 +351,8 @@ class FastUserSet(MutableSet[T]):
     def difference_update(self, other: _Setlike[T]) -> None:
         self.data.difference_update(other)  # type: ignore
 
-    def discard(self, element: T) -> None:
-        self.data.discard(element)
+    def discard(self, value: T) -> None:
+        self.data.discard(value)
 
     def intersection_update(self, other: _Setlike[T]) -> None:
         self.data.intersection_update(other)  # type: ignore
@@ -360,8 +360,8 @@ class FastUserSet(MutableSet[T]):
     def pop(self) -> T:
         return self.data.pop()
 
-    def remove(self, element: T) -> None:
-        self.data.remove(element)
+    def remove(self, value: T) -> None:
+        self.data.remove(value)
 
     def symmetric_difference_update(self, other: _Setlike[T]) -> None:
         self.data.symmetric_difference_update(other)  # type: ignore

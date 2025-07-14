@@ -33,7 +33,7 @@ class SupervisorStrategyT(ServiceT):
         max_restarts: Seconds = 100.0,
         over: Seconds = 1.0,
         raises: Optional[type[BaseException]] = None,
-        replacement: ReplacementT = None,
+        replacement: Optional[ReplacementT] = None,
         **kwargs: Any,
     ) -> None:
         self.replacement: Optional[ReplacementT] = replacement

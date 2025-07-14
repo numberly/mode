@@ -49,7 +49,7 @@ class AsyncIterWrapper(AsyncIterator[T]):
 
 
 @singledispatch
-def aiter(it: Any) -> AsyncIterator[T]:
+def aiter(it: Any) -> AsyncIterator[object]:
     """Create iterator from iterable.
 
     Notes:

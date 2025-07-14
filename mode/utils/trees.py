@@ -48,8 +48,8 @@ class Node(NodeT[T]):
         self,
         data: T,
         *,
-        root: NodeT = None,
-        parent: NodeT = None,
+        root: Optional[NodeT] = None,
+        parent: Optional[NodeT] = None,
         children: Optional[list[NodeT[T]]] = None,
     ) -> None:
         self.data = data

@@ -105,13 +105,13 @@ class GraphFormatter(GraphFormatterT):
     def tail(self) -> str:
         return self.FMT(self._tail)
 
-    def label(self, obj: _T) -> str:
+    def label(self, obj: object) -> str:
         return label(obj)
 
-    def node(self, obj: _T, **attrs: Any) -> str:
+    def node(self, obj: object, **attrs: Any) -> str:
         return self.draw_node(obj, self.node_scheme, attrs)
 
-    def terminal_node(self, obj: _T, **attrs: Any) -> str:
+    def terminal_node(self, obj: object, **attrs: Any) -> str:
         return self.draw_node(obj, self.term_scheme, attrs)
 
     def edge(self, a: _T, b: _T, **attrs: Any) -> str:
@@ -142,7 +142,7 @@ class GraphFormatter(GraphFormatterT):
 
     def draw_node(
         self,
-        obj: _T,
+        obj: object,
         scheme: Optional[Mapping] = None,
         attrs: Optional[Mapping] = None,
     ) -> str:

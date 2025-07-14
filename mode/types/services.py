@@ -60,7 +60,7 @@ class ServiceT(AbstractAsyncContextManager):
     def __init__(
         self,
         *,
-        beacon: NodeT = None,
+        beacon: Optional[NodeT] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None: ...
 
