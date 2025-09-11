@@ -770,9 +770,9 @@ class Service(ServiceBase, ServiceCallbacks):
         futures[stopped] = asyncio.ensure_future(stopped.wait(), loop=loop)
         futures[crashed] = asyncio.ensure_future(crashed.wait(), loop=loop)
         done: set[asyncio.Future]
-        pending: set[asyncio.Future]
+        _pending: set[asyncio.Future]
         try:
-            done, pending = await asyncio.wait(
+            done, _pending = await asyncio.wait(
                 futures.values(),
                 return_when=asyncio.FIRST_COMPLETED,
                 timeout=timeout,
