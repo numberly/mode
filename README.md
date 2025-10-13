@@ -1,32 +1,23 @@
 # AsyncIO Services Fork
 
-![python versions](https://img.shields.io/pypi/pyversions/mode-streaming.svg)
-![implementation](https://img.shields.io/pypi/implementation/mode-streaming)
-![version](https://img.shields.io/pypi/v/mode-streaming)
-![license](https://img.shields.io/pypi/l/mode-streaming)
-![downloads](https://img.shields.io/pypi/dw/mode-streaming)
+![python versions](https://img.shields.io/pypi/pyversions/mode-continued.svg)
+![implementation](https://img.shields.io/pypi/implementation/mode-continued)
+![version](https://img.shields.io/pypi/v/mode-continued)
+![license](https://img.shields.io/pypi/l/mode-continued)
+![downloads](https://img.shields.io/pypi/dw/mode-continued)
 
 
 ---
 
-**Documentation**: <a href="https://faust-streaming.github.io/mode/" target="_blank">https://faust-streaming.github.io/mode/</a>
+**Documentation**: <a href="https://numberly.github.io/mode/" target="_blank">https://numberly.github.io/mode/</a>
 
-**Source Code**: <a href="https://github.com/faust-streaming/mode" target="_blank">https://github.com/faust-streaming/mode</a>
+**Source Code**: <a href="https://github.com/numberly/mode" target="_blank">https://github.com/numberly/mode</a>
 
 ---
 
 ## Why the fork
 
-We have decided to fork the original *Mode* project because there is a critical process of releasing new versions which causes uncertainty in the community. Everybody is welcome to contribute to this *fork*, and you can be added as a maintainer.
-
-We want to:
-
-- Ensure continues release
-- Code quality
-- Support latest Python versions
-- Update the documentation
-
-and more...
+This fork is based on [faust-streaming/mode](https://github.com/faust-streaming/mode)
 
 ## What is Mode?
 

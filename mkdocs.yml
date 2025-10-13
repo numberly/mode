@@ -27,8 +27,8 @@ theme:
   - content.tabs.link
   - content.code.annotate
 
-repo_name: faust-streaming/mode
-repo_url: https://github.com/faust-streaming/mode
+repo_name: numberly/mode
+repo_url: https://github.com/numberly/mode
 
 nav:
   - Mode:

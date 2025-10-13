@@ -16,11 +16,11 @@ build-backend = "setuptools.build_meta"
 universal = true
 
 [project]
-name = "mode-streaming"
+name = "mode-continued"
 dynamic = [
     "version",
 ]
-description = "AsyncIO Service-based programming"
+description = "AsyncIO Service-based programming (fork continued)"
 readme = "README.md"
 requires-python = ">=3.9"
 keywords = ["asyncio", "service", "bootsteps", "graph", "coroutine"]
@@ -70,9 +70,9 @@ uvloop = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/faust-streaming/mode"
-Documentation = "https://faust-streaming.github.io/mode/"
-Repository = "https://github.com/faust-streaming/mode"
+Homepage = "https://github.com/numberly/mode"
+Documentation = "https://numberly.github.io/mode/"
+Repository = "https://github.com/numberly/mode"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
