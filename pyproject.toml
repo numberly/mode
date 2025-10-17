@@ -231,4 +231,4 @@ indent-style = "space"
 line-ending = "auto"
 
 [tool.commitizen]
-version_provider = "pep621"
+version_provider = "scm"
