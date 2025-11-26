@@ -391,7 +391,7 @@ class test_flight_recorder:
                 assert bb.started_at_date
                 assert bb.enabled_by is current_task.return_value
                 ensure_future.assert_called_once_with(
-                    bb._waiting.return_value, loop=bb.loop
+                    bb._waiting.return_value
                 )
                 assert bb._fut is ensure_future.return_value
 

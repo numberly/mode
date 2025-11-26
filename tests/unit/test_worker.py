@@ -205,16 +205,13 @@ class test_Worker:
             cry.assert_called_once_with(file=worker.stderr)
 
     def test__schedule_shutdown(self, worker):
-        with patch("asyncio.ensure_future") as ensure_future:
-            worker._stop_on_signal = Mock()
-            worker._schedule_shutdown(Signals.SIGTERM)
-            assert worker._signal_stop_time
-            ensure_future.assert_called_once_with(
-                worker._stop_on_signal.return_value, loop=worker.loop
-            )
-            worker._stop_on_signal.assert_called_once_with(Signals.SIGTERM)
+        worker.loop = Mock()
+        worker._stop_on_signal = AsyncMock()
+        worker._schedule_shutdown(Signals.SIGTERM)
+        assert worker._signal_stop_time
+        worker._stop_on_signal.assert_called_once_with(Signals.SIGTERM)
 
-            worker._schedule_shutdown(Signals.SIGTERM)
+        worker._schedule_shutdown(Signals.SIGTERM)
 
     @pytest.mark.asyncio
     async def test__stop_on_signal(self, worker):
@@ -223,14 +220,11 @@ class test_Worker:
         worker.stop.assert_awaited_once()
 
     def test_execute_from_commandline(self, worker):
-        with self.patch_execute(worker) as ensure_future:
+        with self.patch_execute(worker):
             with pytest.raises(SystemExit) as excinfo:
                 worker.execute_from_commandline()
             assert excinfo.value.code == 0
-            assert worker._starting_fut is ensure_future.return_value
-            ensure_future.assert_called_once_with(
-                worker.start.return_value, loop=worker.loop
-            )
+            worker.start.assert_called_once()
             worker.stop_and_shutdown.assert_called_once_with()
 
     def test_execute_from_commandline__MemoryError(self, worker):
@@ -256,11 +250,9 @@ class test_Worker:
 
     @contextmanager
     def patch_execute(self, worker):
-        worker.loop = Mock()
-        worker.start = Mock()
+        worker.start = Mock(return_value=asyncio.sleep(0))
         worker.stop_and_shutdown = Mock()
-        with patch("asyncio.ensure_future") as ensure_future:
-            yield ensure_future
+        yield
 
     def test_on_worker_shutdown(self, worker):
         worker.on_worker_shutdown()
@@ -327,9 +319,8 @@ class test_Worker:
         worker._gather_all = Mock()
         worker.loop.is_running.return_value = is_running
         worker._sentinel_task = AsyncMock()
-        with patch("asyncio.ensure_future") as ensure_future:
-            with patch("asyncio.sleep", AsyncMock()):
-                yield ensure_future
+        with patch("asyncio.sleep", AsyncMock()):
+            yield
 
     @pytest.mark.asyncio
     async def test__sentinel_task(self, worker):

@@ -658,7 +658,7 @@ class Service(ServiceBase, ServiceCallbacks):
 
         The future will be joined when this service is stopped.
         """
-        fut = asyncio.ensure_future(self._execute_task(coro), loop=self.loop)
+        fut = asyncio.ensure_future(self._execute_task(coro))
         try:
             fut.set_name(repr(coro))
         except AttributeError:
@@ -744,7 +744,7 @@ class Service(ServiceBase, ServiceCallbacks):
         coro = asyncio.wait(
             [
                 asyncio.ensure_future(
-                    c.wait() if isinstance(c, Event) else c, loop=self.loop
+                    c.wait() if isinstance(c, Event) else c
                 )
                 for c in coros
             ],
@@ -759,16 +759,15 @@ class Service(ServiceBase, ServiceCallbacks):
         timeout = want_seconds(timeout) if timeout is not None else None
         stopped = self._stopped
         crashed = self._crashed
-        loop = self.loop
 
         futures = {
             coro: asyncio.ensure_future(
-                coro if isinstance(coro, Awaitable) else coro.wait(), loop=loop
+                coro if isinstance(coro, Awaitable) else coro.wait()
             )
             for coro in coros
         }
-        futures[stopped] = asyncio.ensure_future(stopped.wait(), loop=loop)
-        futures[crashed] = asyncio.ensure_future(crashed.wait(), loop=loop)
+        futures[stopped] = asyncio.ensure_future(stopped.wait())
+        futures[crashed] = asyncio.ensure_future(crashed.wait())
         done: set[asyncio.Future]
         _pending: set[asyncio.Future]
         try:
@@ -808,8 +807,8 @@ class Service(ServiceBase, ServiceCallbacks):
 
     async def _wait_stopped(self, timeout: Seconds = None) -> None:
         timeout = want_seconds(timeout) if timeout is not None else None
-        stopped = asyncio.ensure_future(self._stopped.wait(), loop=self.loop)
-        crashed = asyncio.ensure_future(self._crashed.wait(), loop=self.loop)
+        stopped = asyncio.ensure_future(self._stopped.wait())
+        crashed = asyncio.ensure_future(self._crashed.wait())
         done, pending = await asyncio.wait(
             [stopped, crashed],
             return_when=asyncio.FIRST_COMPLETED,
@@ -1174,7 +1173,7 @@ class _AwaitableService(Service):
     async def on_start(self) -> None:
         # convert to future, so we can cancel on_stop
         try:
-            self._fut = asyncio.ensure_future(self.coro, loop=self.loop)
+            self._fut = asyncio.ensure_future(self.coro)
             await self._fut
         except asyncio.CancelledError:
             if not self.should_stop:

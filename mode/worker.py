@@ -246,7 +246,7 @@ class Worker(Service):
         if not self._signal_stop_time:
             self._signal_stop_time = self.loop.time()
             self._signal_stop_future = asyncio.ensure_future(
-                self._stop_on_signal(signal), loop=self.loop
+                self._stop_on_signal(signal)
             )
 
     async def _stop_on_signal(self, signal: signal.Signals) -> None:
@@ -259,7 +259,7 @@ class Worker(Service):
         with exiting(file=self.stderr):
             try:
                 self._starting_fut = asyncio.ensure_future(
-                    self.start(), loop=self.loop
+                    self.start()
                 )
                 self.loop.run_until_complete(self._starting_fut)
             except asyncio.CancelledError:
@@ -303,7 +303,7 @@ class Worker(Service):
             self.log.exception("Got exception while waiting: %r", exc)
         finally:
             # Then close the loop.
-            fut = asyncio.ensure_future(self._sentinel_task(), loop=self.loop)
+            fut = asyncio.ensure_future(self._sentinel_task())
             self.loop.run_until_complete(fut)
             self.loop.stop()
             self.log.info("Closing event loop")
