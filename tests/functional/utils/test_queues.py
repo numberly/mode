@@ -33,7 +33,7 @@ class test_FlowControlQueue:
         flow_control.resume()
         await queue.put(1)
         flow_control.suspend()
-        asyncio.ensure_future(self._resume_soon(0.2, flow_control))  # noqa: RUF006
+        asyncio.create_task(self._resume_soon(0.2, flow_control))  # noqa: RUF006
         time_now = monotonic()
         await queue.put(2)
         assert monotonic() - time_now > 0.1
@@ -50,7 +50,7 @@ class test_FlowControlQueue:
         flow_control.resume()
         await queue.put(1)
         flow_control.suspend()
-        asyncio.ensure_future(self._resume_soon(0.2, flow_control))  # noqa: RUF006
+        asyncio.create_task(self._resume_soon(0.2, flow_control))  # noqa: RUF006
         time_now = monotonic()
         await queue.put(2)
         assert monotonic() - time_now > 0.1
@@ -60,7 +60,7 @@ class test_FlowControlQueue:
     async def test_suspend_resume__initially_suspended(self):
         flow_control = FlowControlEvent(initially_suspended=True)
         queue = FlowControlQueue(flow_control=flow_control)
-        asyncio.ensure_future(self._resume_soon(0.2, flow_control))  # noqa: RUF006
+        asyncio.create_task(self._resume_soon(0.2, flow_control))  # noqa: RUF006
         time_now = monotonic()
         await queue.put(1)
         assert await queue.get() == 1
@@ -131,7 +131,7 @@ class test_ThrowableQueue:
         async def clear_queue():
             queue.clear()
 
-        asyncio.ensure_future(clear_queue())  # noqa: RUF006
+        asyncio.create_task(clear_queue())  # noqa: RUF006
         with pytest.raises(asyncio.CancelledError):
             await queue.put(1)
 
@@ -150,7 +150,7 @@ class test_ThrowableQueue:
 
         queue._getters.append(done_future())
 
-        fut = asyncio.ensure_future(waiter())
+        fut = asyncio.create_task(waiter())
         await asyncio.sleep(0.01)
         await queue.throw(KeyError())
         await asyncio.gather(fut)

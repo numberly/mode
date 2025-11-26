@@ -658,7 +658,7 @@ class Service(ServiceBase, ServiceCallbacks):
 
         The future will be joined when this service is stopped.
         """
-        fut = asyncio.ensure_future(self._execute_task(coro))
+        fut = self.loop.create_task(self._execute_task(coro))
         try:
             fut.set_name(repr(coro))
         except AttributeError:
@@ -1173,7 +1173,7 @@ class _AwaitableService(Service):
     async def on_start(self) -> None:
         # convert to future, so we can cancel on_stop
         try:
-            self._fut = asyncio.ensure_future(self.coro)
+            self._fut = self.loop.create_task(self.coro)
             await self._fut
         except asyncio.CancelledError:
             if not self.should_stop:

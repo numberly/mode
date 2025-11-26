@@ -193,13 +193,13 @@ async def test_wait__future_cancelled():
         async def sleeper():
             await asyncio.sleep(10)
 
-        fut = asyncio.ensure_future(sleeper())
+        fut = asyncio.create_task(sleeper())
 
         async def canceller():
             await asyncio.sleep(0.1)
             fut.cancel()
 
-        fut2 = asyncio.ensure_future(canceller())
+        fut2 = asyncio.create_task(canceller())
         with pytest.raises(asyncio.CancelledError):
             await service.wait(fut)
 
@@ -213,13 +213,13 @@ async def test_wait__when_stopped():
         async def sleeper():
             await asyncio.sleep(10)
 
-        fut = asyncio.ensure_future(sleeper())
+        fut = asyncio.create_task(sleeper())
 
         async def stopper():
             await asyncio.sleep(0.1)
             await service.stop()
 
-        fut2 = asyncio.ensure_future(stopper())
+        fut2 = asyncio.create_task(stopper())
         assert (await service.wait(fut)).stopped
 
         fut2.cancel()
@@ -232,7 +232,7 @@ async def test_wait__when_crashed():
         async def sleeper():
             await asyncio.sleep(10)
 
-        fut = asyncio.ensure_future(sleeper())
+        fut = asyncio.create_task(sleeper())
 
         async def crasher():
             await asyncio.sleep(0.1)
@@ -241,7 +241,7 @@ async def test_wait__when_crashed():
             except RuntimeError as exc:
                 await service.crash(exc)
 
-        fut2 = asyncio.ensure_future(crasher())
+        fut2 = asyncio.create_task(crasher())
         assert await service.wait_for_stopped(fut)
 
         fut2.cancel()
@@ -261,9 +261,9 @@ async def test_wait__multiple_events():
             await asyncio.sleep(0.1)
             event2.set()
 
-        fut1 = asyncio.ensure_future(loser())
+        fut1 = asyncio.create_task(loser())
         try:
-            fut2 = asyncio.ensure_future(winner())
+            fut2 = asyncio.create_task(winner())
             try:
                 result = await service.wait_first(event1, event2)
                 assert not result.stopped

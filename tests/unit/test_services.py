@@ -157,7 +157,7 @@ class test_Service:
 
         async def mywait():
             foo()
-            asyncio.ensure_future(s.stop())  # noqa: RUF006
+            asyncio.create_task(s.stop())  # noqa: RUF006
             await asyncio.sleep(10.0)
 
         s = service.from_awaitable(mywait())
@@ -650,7 +650,7 @@ class test_Service:
             # ``await`` any dangling ``async def`` calls
             # to avoid the "coroutine x was never awaited" warnings.
             for fut in to_cancel:
-                handle = asyncio.ensure_future(fut)
+                handle = asyncio.create_task(fut)
                 handle.cancel()
                 try:
                     await handle

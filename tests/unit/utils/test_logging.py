@@ -386,14 +386,14 @@ class test_flight_recorder:
         bb._fut = None
         bb._waiting = Mock()
         with patch("mode.utils.logging.current_task") as current_task:
-            with patch("asyncio.ensure_future") as ensure_future:
+            with patch.object(bb.loop, "create_task") as create_task:
                 bb.activate()
                 assert bb.started_at_date
                 assert bb.enabled_by is current_task.return_value
-                ensure_future.assert_called_once_with(
+                create_task.assert_called_once_with(
                     bb._waiting.return_value
                 )
-                assert bb._fut is ensure_future.return_value
+                assert bb._fut is create_task.return_value
 
     def test_activate__already_activated(self, bb):
         bb._fut = Mock()

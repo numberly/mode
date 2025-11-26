@@ -245,7 +245,7 @@ class Worker(Service):
     def _schedule_shutdown(self, signal: signal.Signals) -> None:
         if not self._signal_stop_time:
             self._signal_stop_time = self.loop.time()
-            self._signal_stop_future = asyncio.ensure_future(
+            self._signal_stop_future = self.loop.create_task(
                 self._stop_on_signal(signal)
             )
 
@@ -258,7 +258,7 @@ class Worker(Service):
         self._starting_fut = None
         with exiting(file=self.stderr):
             try:
-                self._starting_fut = asyncio.ensure_future(
+                self._starting_fut = self.loop.create_task(
                     self.start()
                 )
                 self.loop.run_until_complete(self._starting_fut)
@@ -303,7 +303,7 @@ class Worker(Service):
             self.log.exception("Got exception while waiting: %r", exc)
         finally:
             # Then close the loop.
-            fut = asyncio.ensure_future(self._sentinel_task())
+            fut = self.loop.create_task(self._sentinel_task())
             self.loop.run_until_complete(fut)
             self.loop.stop()
             self.log.info("Closing event loop")

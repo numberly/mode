@@ -721,7 +721,7 @@ class flight_recorder(AbstractContextManager, LogSeverityMixin):
         if current_flight_recorder is not None:
             for k, v in current_flight_recorder.extra_context.items():
                 self.extra_context.setdefault(k, v)
-        self._fut = asyncio.ensure_future(self._waiting())
+        self._fut = self.loop.create_task(self._waiting())
 
     def cancel(self) -> None:
         fut, self._fut = self._fut, None

@@ -94,7 +94,7 @@ class test_ServiceThread:
         thread.add_future = AsyncMock(name="thread.add_future")
         thread._thread_running = None
         assert thread.parent_loop == event_loop
-        asyncio.ensure_future(self._wait_for_event(thread))  # noqa: RUF006
+        asyncio.create_task(self._wait_for_event(thread))  # noqa: RUF006
         await thread.start()
 
         thread.Worker.assert_called_once_with(thread)
@@ -108,7 +108,7 @@ class test_ServiceThread:
         thread.wait_for_thread = False
         thread._thread_running = None
         assert thread.parent_loop == event_loop
-        asyncio.ensure_future(self._wait_for_event(thread))  # noqa: RUF006
+        asyncio.create_task(self._wait_for_event(thread))  # noqa: RUF006
         await thread.start()
 
         thread.Worker.assert_called_once_with(thread)

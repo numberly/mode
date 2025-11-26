@@ -17,7 +17,7 @@ async def test_format_task_stack():  # noqa: C901
         await baz()
 
     async def baz():
-        task = asyncio.ensure_future(xuz())
+        task = asyncio.create_task(xuz())
         await asyncio.sleep(0.1)
         for _ in range(100):
             assert format_task_stack(task, limit=0)
@@ -44,14 +44,14 @@ async def test_format_task_stack():  # noqa: C901
 
     await foo()
 
-    task = asyncio.ensure_future(xuz2())
+    task = asyncio.create_task(xuz2())
     await asyncio.sleep(0.05)
     assert format_task_stack(task, limit=None)
 
     async def moo():
         await asyncio.sleep(0.1)
 
-    task = asyncio.ensure_future(moo())
+    task = asyncio.create_task(moo())
     await asyncio.sleep(0.05)
     assert format_task_stack(task, limit=None)
 
