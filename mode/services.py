@@ -743,9 +743,7 @@ class Service(ServiceBase, ServiceCallbacks):
         timeout = want_seconds(timeout) if timeout is not None else None
         coro = asyncio.wait(
             [
-                asyncio.ensure_future(
-                    c.wait() if isinstance(c, Event) else c
-                )
+                asyncio.ensure_future(c.wait() if isinstance(c, Event) else c)
                 for c in coros
             ],
             return_when=asyncio.ALL_COMPLETED,

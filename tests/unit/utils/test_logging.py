@@ -390,9 +390,7 @@ class test_flight_recorder:
                 bb.activate()
                 assert bb.started_at_date
                 assert bb.enabled_by is current_task.return_value
-                create_task.assert_called_once_with(
-                    bb._waiting.return_value
-                )
+                create_task.assert_called_once_with(bb._waiting.return_value)
                 assert bb._fut is create_task.return_value
 
     def test_activate__already_activated(self, bb):

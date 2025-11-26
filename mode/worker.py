@@ -258,9 +258,7 @@ class Worker(Service):
         self._starting_fut = None
         with exiting(file=self.stderr):
             try:
-                self._starting_fut = self.loop.create_task(
-                    self.start()
-                )
+                self._starting_fut = self.loop.create_task(self.start())
                 self.loop.run_until_complete(self._starting_fut)
             except asyncio.CancelledError:
                 pass
